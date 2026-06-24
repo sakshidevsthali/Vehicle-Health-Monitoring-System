@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Vehicle Health Monitoring</title>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+
+        body{
+            background:#0f172a;
+            overflow:hidden;
+            height:100vh;
+        }
+
+        .login-card{
+            animation: floatCard 3s ease-in-out infinite;
+            width:400px;
+            background:rgba(255,255,255,0.1);
+            backdrop-filter:blur(10px);
+            border-radius:20px;
+            padding:30px;
+            color:white;
+            box-shadow:0px 0px 20px rgba(255,255,255,0.2);
+        }
+
+        .center-box{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .road{
+              position:absolute;
+              bottom:0;
+              width:100%;
+              height:80px;
+              background:#2c2c2c;
+              border-top:4px solid white;
+            }
+        
+        .lane{
+
+            position:absolute;
+            top:35px;
+
+            width:200%;
+            height:6px;
+
+            background:
+            repeating-linear-gradient(
+            to right,
+            white 0px,
+            white 40px,
+            transparent 40px,
+            transparent 80px
+         );
+
+    animation: roadMove 2s linear infinite;
+}
+        
+        .car{
+                position:absolute;
+                font-size:40px;
+            }
+
+        .car1{
+             bottom:55px;
+             animation:drive1 8s linear infinite;
+            }
+
+        .car2{
+            bottom:105px;
+            animation:drive2 6s linear infinite;
+             }
+
+        .car3{
+              bottom:155px;
+              animation:drive3 10s linear infinite;
+            }
+        @keyframes drive1{
+
+            from{
+                 left:-10%;
+                }
+
+            to{
+                 left:110%;
+              }
+        }
+
+        @keyframes drive2{
+
+            from{
+                left:-20%;
+                }
+
+            to{
+               left:110%;
+              }
+        }
+
+        @keyframes drive3{
+
+             from{
+                  left:-15%;
+                 }
+
+              to{
+                 left:110%;
+               }
+       }
+
+       @keyframes floatCard {
+
+         0%{
+            transform: translateY(0px);
+           }
+
+        50%{
+            transform: translateY(-10px);
+           }
+
+        100%{
+             transform: translateY(0px);
+            }
+        }
+        @keyframes roadMove{
+
+                from{
+                    transform: translateX(0);
+                    }
+
+                to{
+                    transform: translateX(-80px);
+                  }
+        }       
+
+    </style>
+
+</head>
+
+<body> 
+    <div class="logo-container">
+
+    <div class="rotating-car">
+        🏎️
+    </div>
+
+    <div class="system-title">
+        Vehicle Health Monitoring System
+    </div>
+
+</div>
+
+<div class="center-box">
+
+    <div class="login-card text-center">
+
+        <div class="mb-4">
+
+    <h1 style="
+        font-size:40px;
+        color:#60a5fa;
+        font-weight:bold;
+    ">
+        🚗
+    </h1>
+
+        <h2>
+            Vehicle Health Monitoring
+        </h2>
+
+        <p style="color:#cbd5e1;">
+            Smart Fleet Analytics &
+            Predictive Maintenance
+        </p>
+
+    </div>
+
+        <div id="clock" class="mb-3">
+            00:00:00
+        </div>
+
+        <hr>
+
+        <form action="/login" method="post">
+            <input
+                 type="text"
+                 name="username"
+                 class="form-control mb-3"
+                 placeholder="Username">
+
+            <input
+               type="password"
+               name="password"
+               class="form-control mb-3"
+               placeholder="Password">
+
+            <button
+                type="submit"
+                class="btn btn-primary w-100">
+
+                Login
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="road">
+     <div class="lane"></div>
+</div>
+
+<div class="car car1">🚗</div>
+<div class="car car2">🏎️</div>
+<div class="car car3">🚙</div>
+
+</body>
+<div class="car car1">🚗</div>
+<div class="car car2">🏎️</div>
+<div class="car car3">🚙</div>
+
+<script>
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById("clock").innerHTML =
+        now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+<div style="
+    position:fixed;
+    bottom:5px;
+    width:100%;
+    text-align:center;
+    color:white;
+    font-size:14px;
+    z-index:999;
+">
+    Developed by Sakshi Devsthali
+</div>
+
+</body>
+
+</html>

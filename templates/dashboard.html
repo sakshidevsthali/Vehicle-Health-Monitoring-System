@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Vehicle Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+
+    .blink-critical{
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink{
+        50%{
+            opacity: 0.4;
+        }
+    }
+
+    </style>
+
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+   <h1 class="text-center mb-4">
+    🚗 Vehicle Health Monitoring Dashboard
+    </h1>
+
+    <div class="d-flex justify-content-between mb-3">
+
+    <h5>
+        Welcome, {{user}}
+    </h5>
+
+    <a href="/logout" class="btn btn-danger">
+        Logout
+    </a>
+
+    </div>
+
+    
+    <div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h5>Total Vehicles</h5>
+                <h2>{{total}}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h5>Healthy</h5>
+                <h2>{{healthy}}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-bg-danger">
+            <div class="card-body">
+                <h5>Critical</h5>
+                <h2>{{critical}}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-bg-warning">
+            <div class="card-body">
+                <h5>Warning</h5>
+                <h2>{{warning}}</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="card mt-4 and mb-5 shadow">
+
+    <div class="card-header bg-primary text-white">
+        Vehicle Creation Trend
+    </div>
+
+    <div class="card-body" >
+
+       <div style="width:500px;height:300px;margin:auto;">
+          <canvas id="trendChart"></canvas>
+       </div>
+
+    </div>
+
+</div>
+
+</div>
+
+  <div class="mb-3">
+
+    <a href="/add-vehicle" class="btn btn-success">
+        Add Vehicle
+    </a>
+
+    <a href="/export" class="btn btn-info">
+        Export Excel
+    </a>
+
+    <a href="/simulate" class="btn btn-primary">
+        🚗 Generate Test Vehicle
+    </a>
+
+    <form action="/simulate-fleet" method="get" class="d-inline">
+
+    <input
+        type="number"
+        name="fleet_size"
+        value="10"
+        min="1"
+        max="500"
+        class="form-control d-inline"
+        style="width:120px; display:inline-block;">
+
+    <button
+        type="submit"
+        class="btn btn-dark">
+
+        🚛 Generate Fleet
+
+    </button>
+
+    </form>
+
+   </div>
+    <form action="/dashboard" method="get" class="mb-3">
+
+    <div class="row">
+
+        <div class="col-md-4">
+
+            <input
+                type="text"
+                name="search"
+                class="form-control"
+                placeholder="Enter Vehicle ID">
+
+        </div>
+
+        <div class="col-md-3">
+            <button
+                type="submit"
+                class="btn btn-primary">
+                Search
+            </button>
+           
+
+            <a href="/dashboard"
+               class="btn btn-secondary">
+                Show All
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+<div class="mb-3">
+
+    <a href="/dashboard" class="btn btn-dark">
+        All
+    </a>
+
+    <a href="/dashboard?status=Healthy" class="btn btn-success">
+        Healthy
+    </a>
+
+    <a href="/dashboard?status=Critical" class="btn btn-danger">
+        Critical
+    </a>
+
+    <a href="/dashboard?status=Warning" class="btn btn-warning">
+        Warning
+    </a>
+
+</div>
+
+    <table class="table table-striped table-bordered shadow">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>ID</th>
+                <th>Vehicle ID</th>
+                <th>Speed</th>
+                <th>Temperature</th>
+                <th>Fuel</th>
+                <th>Battery</th>
+                <th>Status</th>
+                <th>Actions</th>
+                <th>DTC Code</th>
+                <th>DTC Description</th>
+                <th>Risk Score</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for vehicle in vehicles %}
+
+        <tr>
+
+           <td>{{vehicle.id}}</td>
+            <td>{{vehicle.vehicle_id}}</td>
+            <td>{{vehicle.speed}}</td>
+            <td>{{vehicle.engine_temp}}</td>
+            <td>{{vehicle.fuel_level}}</td>
+            <td>{{vehicle.battery_voltage}}</td>
+
+            <td>
+                {% if vehicle.status == "Healthy" %}
+
+                    <span class="badge bg-success">
+                        Healthy
+                    </span>
+
+                {% elif vehicle.status == "Critical" %}
+
+                    <span class="badge bg-danger blink-critical">
+                        Critical
+                    </span>
+
+                {% else %}
+
+                    <span class="badge bg-warning">
+                        Warning
+                    </span>
+
+                {% endif %}
+            </td>
+
+
+
+             <td>
+
+                   <a href="/vehicle/{{vehicle.id}}"
+                    class="btn btn-primary btn-sm">
+                        View
+                    </a>
+
+                    <a href="/edit/{{vehicle.id}}"
+                    class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                    <a href="/delete/{{vehicle.id}}"
+                    class="btn btn-danger btn-sm">
+                        Delete
+                    </a>
+            </td>
+
+            <td>{{vehicle.dtc_code}}</td>
+            <td>{{vehicle.dtc_description}}</td>
+            <td>
+
+            {% if vehicle.risk_score >= 70 %}
+
+            <span class="badge bg-danger">
+                {{vehicle.risk_score}}%
+            </span>
+
+            {% elif vehicle.risk_score >= 40 %}
+
+            <span class="badge bg-warning">
+                {{vehicle.risk_score}}%
+            </span>
+
+            {% else %}
+
+            <span class="badge bg-success">
+                {{vehicle.risk_score}}%
+            </span>
+
+            {% endif %}
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="card mt-4">
+
+    <div class="card-header bg-danger text-white">
+        Vehicle Alerts
+    </div>
+    <class="card mt-4">
+
+    <div class="card-header bg-warning">
+        Predictive Maintenance Alerts
+    </div>
+
+    <div class="card-body">
+
+        {% if maintenance_alerts %}
+
+            <ul class="list-group">
+
+                {% for alert in maintenance_alerts %}
+
+                    <li class="list-group-item">
+                        {{alert}}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        {% else %}
+
+            <p>No Maintenance Required</p>
+
+        {% endif %}
+
+    </div>
+
+</class>
+
+    <div class="card-body">
+
+        {% if alerts %}
+
+            <ul class="list-group">
+
+                {% for alert in alerts %}
+
+                    <li class="list-group-item">
+                        {{alert}}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        {% else %}
+
+            <p>No active alerts.</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="card mt-4 shadow">
+
+    <div class="card-header">
+        Vehicle Health Chart
+    </div>
+
+    <div class="card-body">
+
+        <p>
+        Healthy={{healthy}}
+        Critical={{critical}}
+        Warning={{warning}}
+        </p>
+        <div style="width:300px;height:300px;margin:auto;">
+          <canvas id="healthChart"></canvas>
+        </div>
+     </div>  
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx = document.getElementById('healthChart');
+
+new Chart(ctx, {
+
+    type: 'pie',
+
+    options:{
+
+    responsive: true,
+    maintainAspectRatio: false,
+    },
+
+    data: {
+        labels: ['Healthy', 'Critical', 'Warning'],
+        datasets: [{  
+           data: [
+                Number("{{healthy}}"),
+                Number("{{critical}}"),
+                Number("{{warning}}")
+                ]
+            }] 
+        }
+});
+
+
+
+</script>
+<script>
+
+const trendCtx =
+document.getElementById('trendChart');
+
+new Chart(trendCtx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: {{ trend_labels | tojson }},
+
+        datasets: [{
+
+            label: 'Vehicles Created',
+
+            data: {{ trend_data | tojson }},
+
+            borderWidth: 3
+
+        }]
+
+    }
+
+});
+
+</script>
+</div>
+<div class="card mt-4 mb-5 shadow">
+
+    <div class="card-header bg-success text-white">
+        Fleet Health Trend
+    </div>
+
+    <div class="card-body">
+
+        <div style="width:100%;height:350px;">
+            <canvas id="fleetHealthChart"></canvas>
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+const healthCtx =
+document.getElementById('fleetHealthChart');
+
+new Chart(healthCtx, {
+
+    type: 'bar',
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    },
+
+    data: {
+
+        labels: {{ health_labels | tojson }},
+
+        datasets: [
+
+        {
+            label: 'Healthy',
+            data: {{ healthy_data | tojson }},
+            borderWidth: 3
+        },
+
+        {
+            label: 'Critical',
+            data: {{ critical_data | tojson }},
+            borderWidth: 3
+        },
+
+        {
+            label: 'Warning',
+            data: {{ warning_data | tojson }},
+            borderWidth: 3
+        }
+
+        ]
+    }
+
+});
+
+
+</script>
+<script>
+setTimeout(function() {
+    location.reload();
+}, 10000);
+</script>
+
+<footer
+style="
+text-align:center;
+padding:15px;
+margin-top:40px;
+color:gray;
+">
+
+
+Developed by Sakshi Devsthali
+
+</footer>
+
+</body>
+
+</html>

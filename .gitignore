@@ -1,0 +1,7 @@
+**pycache**/
+*.pyc
+venv/
+.env
+*.db-journal
+vehicle_report_*.pdf
+vehicles.xlsx

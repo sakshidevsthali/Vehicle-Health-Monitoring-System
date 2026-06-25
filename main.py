@@ -19,6 +19,7 @@ from reportlab.platypus import (
     Table,
     TableStyle
 )
+from fastapi.responses import RedirectResponse
 
 from reportlab.lib import colors
 app = FastAPI()
@@ -40,8 +41,12 @@ class Vehicle(BaseModel):
     fuel_level: int
     battery_voltage: float
 
-@app.get("/", response_class=HTMLResponse)
-def home():
+@app.get("/")
+def root():
+    return RedirectResponse(
+        url="/login",
+        status_code=303
+    )
 
     with engine.connect() as conn:
 
@@ -205,11 +210,12 @@ def save_vehicle(
         )
 
         conn.commit()
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
-    return {
-        "message": "Vehicle Saved Successfully",
-        "status": status
-    }
+   
 @app.post("/vehicle")
 def add_vehicle(vehicle: Vehicle):
 
@@ -304,10 +310,10 @@ def generate_report(
 ):
  if "user" not in request.session:
 
-    return RedirectResponse(
-        url="/login",
-        status_code=303
-    )
+   return {
+    "message": "Vehicle Saved Successfully",
+    "status": status
+}
 
  def generate_report(vehicle_id: int):
 

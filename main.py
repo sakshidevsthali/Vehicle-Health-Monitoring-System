@@ -262,8 +262,9 @@ def add_vehicle(vehicle: Vehicle):
 
     return {
         "message": "Vehicle Added Successfully",
-        "status": status
+         "status": status
     }
+   
 
 @app.get("/vehicles")
 def get_vehicles():
@@ -308,14 +309,12 @@ def generate_report(
     request: Request,
     vehicle_id: int
 ):
- if "user" not in request.session:
 
-   return {
-    "message": "Vehicle Saved Successfully",
-    "status": status
-}
-
- def generate_report(vehicle_id: int):
+    if "user" not in request.session:
+        return RedirectResponse(
+            url="/login",
+            status_code=303
+        )
 
     with engine.connect() as conn:
 
@@ -326,6 +325,9 @@ def generate_report(
 
         vehicle = result.fetchone()
 
+        if not vehicle:
+            return {"error": "Vehicle not found"}
+
     pdf_file = f"vehicle_report_{vehicle_id}.pdf"
 
     doc = SimpleDocTemplate(pdf_file)
@@ -333,6 +335,25 @@ def generate_report(
     styles = getSampleStyleSheet()
 
     content = []
+
+ #def generate_report(vehicle_id: int):
+
+   # with engine.connect() as conn:
+
+       # result = conn.execute(
+           # text("SELECT * FROM vehicle WHERE id=:id"),
+            #{"id": vehicle_id}
+        #)
+
+        #vehicle = result.fetchone()
+
+    #pdf_file = f"vehicle_report_{vehicle_id}.pdf"
+
+    #doc = SimpleDocTemplate(pdf_file)
+
+    #styles = getSampleStyleSheet()
+
+    #content = []
 
     # Header
 
@@ -493,7 +514,12 @@ def generate_report(
 
     content.append(dtc_table)
         
+   
+    print("Building PDF...")
+
     doc.build(content)
+
+    print("PDF Created:", pdf_file)
 
     return FileResponse(
             pdf_file,

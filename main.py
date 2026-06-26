@@ -128,7 +128,13 @@ def root():
 from fastapi.responses import HTMLResponse
 
 @app.get("/add-vehicle", response_class=HTMLResponse)
-def add_vehicle_page():
+def add_vehicle_page(request: Request):
+
+    if "user" not in request.session:
+        return RedirectResponse(
+            url="/login",
+            status_code=303
+        )
 
     return """
     <html>
@@ -171,17 +177,24 @@ def add_vehicle_page():
     </html>
     """
 @app.post("/save-vehicle")
+
 def save_vehicle(
+    request: Request,
     vehicle_id: str = Form(...),
     speed: int = Form(...),
     engine_temp: int = Form(...),
     fuel_level: int = Form(...),
     battery_voltage: float = Form(...)
 ):
-
+    if "user" not in request.session:
+      return RedirectResponse(
+            url="/login",
+            status_code=303
+        )
+    
     status = "Healthy"
 
-    if engine_temp > 100:
+    if  engine_temp > 100:
         status = "Critical"
 
     elif fuel_level < 15:
@@ -190,7 +203,7 @@ def save_vehicle(
     elif battery_voltage < 11:
         status = "Critical"
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
 
         conn.execute(
             text("""
@@ -209,10 +222,9 @@ def save_vehicle(
             }
         )
 
-        conn.commit()
-        return RedirectResponse(
-            url="/",
-            status_code=303
+    return RedirectResponse(
+        url="/dashboard",
+        status_code=303
         )
 
    
@@ -941,8 +953,16 @@ def delete_vehicle(vehicle_id: int):
 )
 
 @app.get("/edit/{vehicle_id}", response_class=HTMLResponse)
-def edit_vehicle(vehicle_id: int):
+def edit_vehicle(
+    request: Request,
+    vehicle_id: int
+     ):
 
+    if "user" not in request.session:
+        return RedirectResponse(
+            url="/login",
+            status_code=303
+        )
     with engine.connect() as conn:
 
         result = conn.execute(
@@ -951,6 +971,11 @@ def edit_vehicle(vehicle_id: int):
         )
 
         vehicle = result.fetchone()
+        if vehicle is None:
+            return HTMLResponse(
+                content="<h2>Vehicle not found.</h2>",
+                status_code=404
+            )
 
     return f"""
     <html>
